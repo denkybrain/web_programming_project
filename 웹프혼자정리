@@ -1,0 +1,30 @@
+
+
+
+		웹프 코드짤 때 잘 틀리는 거 
+
+		1.자바스크립트에서 html의 element value 접근할 때 
+		document.getElementsByClassName('searchInput')[0].value;
+		document.getElementsByClassName('searchInput')[0].innerHTML;
+		이런식으로 인덱스 접근을 해야댐
+
+		2.자바스크립트에서 배열 생성 방법
+		var ary = [];
+		이런식으로 생성함
+		
+		3.자바스크립트에서 배열을 사용할 때 동적으로 크기를 늘림
+		var ary = [];
+		일 때 ary.length는 현재 0이다
+		만약에 ary에 객체를 넣고싶으면
+		ary.length++ 한 뒤에
+		ary[length-1] = OBJECT 이런식으로 넣어줘야 한다.
+
+		4.JQEURY에서 PUT POST PATCH DELETE 차이점을 알아야 한다.
+
+		5.String에서 indexOf는 특이하다.
+		str.indexOf(str2)라고 했을 때 일치하는 값이 없으면 음수를 출력하고
+		일치하는 구간부터 index를 출력한다.
+
+		6.HTML을 바꾸려면 JQUERY를 쓰는게 편하다
+		$('.paperNo'+memoIndicator).append(data);
+		이런식으로 HTML문(data변수에 있는 값)을 쉽게 넣을 수 있다.

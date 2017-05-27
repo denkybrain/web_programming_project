@@ -1,0 +1,155 @@
+<HTML> 
+	<HEAD><TITLE>Wi-Note</TITLE> 
+<meta charset="utf-8">
+		<!-- 좆같은 ckeditor -->
+
+		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="ckeditor/ckeditor.js"></script>
+		<script src="ckeditor/adapters/jquery.js"></script>
+
+		<!-- 좆같은 ckeditor -->
+
+
+
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+		<!-- Optional theme -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+		<link rel="stylesheet" href="main.css">
+			</HEAD> 
+			<body>
+				<div id="container" style="width:100%; height:500px;">
+					<div class="headLine">
+
+
+						<div class="profileDiv">
+
+							<h5 class="profile">정위대님</h5>
+
+						</div>
+
+						<div class="topbar" >
+							<img src="./icon.png" >
+									<h1 style="width: 40%;">Don't forget your wiseness</h1>
+							<input class="searchInput" type="text" name="hint" placeholder="당신의 생각을 검색하세요">
+						</div>
+
+
+					</div>
+
+
+
+					<div id="menu" style="background-color:#FFFFFF;height:1000px;width:20%;float:left; padding-top: 30px;
+					border:1px solid #949494;
+					">
+					<p class="newMemo"><a href="write2.html"> 새 메모 쓰기</a></p>
+					<ul class="menu_folder">
+						<li><a href="main.html">전체 메모</a></li>
+						<li>중요 메모</li>
+						<li>공유 메모</li>
+					</ul>
+					<p class="deleteAllMemoBtn" onclick="delAllMemo();">메모 비우기</p>
+					<p class="folderAddBtn">메모 폴더 추가</p>
+				</div>
+				<div id="content" style="background-color:#FFFFFF;height:1000px;width:80%;float:left; border:1px solid #949494;
+				border-left: 0px;
+				">
+
+
+				<form style="height: 400px;">
+					<textarea name="editor1" id="editor1" rows="15" cols="80" style="height:100%;">
+					</textarea>
+					<script>
+			// Replace the <textarea id="editor1"> with a CKEditor
+			// instance, using default configuration.
+			CKEDITOR.config.width = "99.9%"; // ³ÐÀÌ 
+			CKEDITOR.config.height = 400; // ³ôÀÌ // ÆÛ¼¾Æ®·Î °¡´ÉÇÕ´Ï´Ù.
+			CKEDITOR.config.fontSize_defaultLabel = "20px"; // ³ôÀÌ // ÆÛ¼¾Æ®·Î °¡´ÉÇÕ´Ï´Ù.
+
+			//CKEDITOR.config.language = 'ja';
+			CKEDITOR.replace( 'editor1',{
+				filebrowserImageUploadUrl: "ckeditor/plugins/imgupload.php"
+			});
+			
+			CKEDITOR.on('dialogDefinition', function( ev ){
+				var dialogName = ev.data.name;
+				var dialogDefinition = ev.data.definition;
+
+				switch (dialogName) {
+					case 'image':
+                    dialogDefinition.removeContents('Link'); // Link ÅÇ Á¦°Å
+                    break;
+                }
+                var uploadTab = dialogDefinition.getContents( 'Upload' );
+                var uploadButton = uploadTab.get('uploadButton');
+                uploadButton['filebrowser']['onSelect'] = function( fileUrl, errorMessage ) {
+				console.log(fileUrl); // ¾÷·ÎµåµÈ ÆÄÀÏ url ÀÔ´Ï´Ù. 
+			}
+
+		});
+			
+	</script>
+</form>
+<button id="memoSave" onclick="btn_click();" style="width: 100%; height: 85px; border:none;"> 메모 </button>
+<script>
+	function btn_click(){
+		var memoContents = CKEDITOR.instances.editor1.getData();
+
+		var IndexURI = "https://myweb-554e3.firebaseio.com/memo/index.json";
+		var memoURI = "https://myweb-554e3.firebaseio.com/memo.json";
+		var baseURI = "https://myweb-554e3.firebaseio.com/memo/wrapper/";
+		$.ajax({
+			url : IndexURI,
+			method : "GET",
+
+			success : function(data){
+				var indexNumber = Number(data);
+				//인덱스 읽어들이기 종료
+				var plusIndex = indexNumber +1;
+				var param = {
+					"index" : plusIndex
+				};
+				$.ajax ( { 
+					url : memoURI,
+					method : "PATCH",
+					data : JSON.stringify(param),
+					success : function(data){
+					}
+				});
+				//인덱스 추가시킴
+				////이까지 읽어들이기
+				var titleURI = baseURI+"memo"+indexNumber+".json";
+				var param = {
+					content : memoContents
+				};
+
+				$.ajax ( { //메모 데이터 전송
+					url : titleURI,
+					method : "PATCH",
+					data : JSON.stringify(param),
+					success : function(data){
+						$(location).attr('href',"main.html");
+
+					}
+				});
+			}
+		});
+	}
+</script>
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+</div>
+</body>
+</html> 
