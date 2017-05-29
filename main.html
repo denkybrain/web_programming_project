@@ -2,58 +2,73 @@
 	<HEAD><TITLE>Wi-Note</TITLE> 
 		<meta charset="utf-8">
 		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
-		<!-- Optional theme -->
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+<!-- 부가적인 테마 -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 		<link rel="stylesheet" href="main.css">
-			</HEAD> 
-			
-			<body onload="showloading();">
-				<div id="container" style="width:100%; height:500px;">
-					<div class="headLine">
+	</HEAD> 
+
+	<body onload="showloading();">
+		<div id="container" style="width:100%; height:500px;">
+			<div class="headLine">
 
 
-						<div class="profileDiv">
+				<div class="profileDiv">
 
-							<h5 class="profile">정위대님</h5>
+					<h5 class="profile">정위대님</h5>
 
-						</div>
+				</div>
 
-						<div class="topbar">
-							<img src="./icon.png" >
-							<h1 style="width: 40%;">Don't forget your wiseness</h1>
+				<div class="topbar">
+					<img src="./icon.png" >
+					<h1 style="width: 40%;">Don't forget your wiseness</h1>
 
-							<input class="searchInput" onkeyup="searchKey(0);" type="text" name="hint" placeholder="당신의 생각을 검색하세요">
-							<script>
-							function baseFlush(){
+					<input class="searchInput" onkeyup="searchKey(0);" type="text" name="hint" placeholder="당신의 생각을 검색하세요">
+					<script>
+					var memoAry = [];
+					function memoAryFlush(numb){
+						memoAry = [];
+						memoAry.length = numb;
+					}
+						function showDialog(dialog){
+							document.getElementsByClassName('loadIndicator')[0].innerHTML = dialog;
+						}
+						function baseFlush(){
+							document.getElementsByClassName('paperContainer')[0].innerHTML= "";
+							document.getElementsByClassName('loadIndicator')[0].innerHTML= "";
+						}
+						function showloading(){
+							baseFlush();
+							var loader = "<br><br><CENTER>로딩중입니다.혹은 데이터베이스가 비어있습니다.</center>";
+							showDialog(loader);
+						}
+						function showError(){
+							baseFlush();
+							var error = "<br><br><CENTER>해쉬태그로 검색해주세요!</center>";
+							showDialog(error);
+						}
+						function flushHTML(){
+							var contentHTML =
+							document.getElementsByClassName('loadIndicator')[0].innerHTML;                              
+							var someThinginContent = 
+							contentHTML== "<br><br><center>로딩중입니다.혹은 데이터베이스가 비어있습니다.</center>";
+								if(someThinginContent == 0)//로딩중이 아니라 다른 문구면
+									someThinginContent = contentHTML == "<br><br><CENTER>해쉬태그로 검색해주세요!</center>";
+								if(someThinginContent == true)
+									baseFlush(); //비워버림
+						}
 
-								document.getElementsByClassName('paperContainer')[0].innerHTML= "";
-								document.getElementsByClassName('loadIndicator')[0].innerHTML= "";
-							}
-							function showloading(){
-								baseFlush();
-								var loader = "<br><br><CENTER>로딩중입니다.혹은 데이터베이스가 비어있습니다.</center>";
-								document.getElementsByClassName('loadIndicator')[0].innerHTML = loader;
-							}
-							function flushHTML(){
-								var contentHTML =
-								document.getElementsByClassName('loadIndicator')[0].innerHTML;
-								var someThinginContent = contentHTML== "<br><br><center>로딩중입니다.혹은 데이터베이스가 비어있습니다.</center>";
-								if(someThinginContent == true){
-									baseFlush();
-								}
-								
-							}
-
-								function searchByClick(id){
-									document.getElementsByClassName('searchInput')[0].value = id;
-									searchKey(id);	
-								}
-								function searchKey(id){
-
-									var clickOrEnter = 0;
-									if(id != 0 ||window.event.keyCode == 13){
+						function searchByClick(id){
+							document.getElementsByClassName('searchInput')[0].value = id;
+							searchKey(id);  
+						}
+							function searchKey(id){
+								var clickOrEnter = 0;
+								if(id != 0 ||window.event.keyCode == 13){
 									
 									var searchText = "";
 									if(id != 0 ){
@@ -61,8 +76,8 @@
 									} else{
 										searchText = 
 										document.getElementsByClassName('searchInput')[0].value;
-										}
-										showloading();
+									}
+									showloading();
 										//alert(searchText);
 										var searchHashes = [];
 										var searchWord = "";
@@ -71,8 +86,8 @@
 										var linkedContent = '';
 										for(var word in splitedArray){
 											word = splitedArray[word];
-											if(true){										
-											//if(word.indexOf('#') == 0){
+											//if(true){                                     
+												if(word.indexOf('#') >= 0){
 												//alert("용량 : "+searchHashes);
 												searchHashes.length++;
 												searchHashes[searchHashes.length-1] = word; //배열의 크기를 조정해야 되는구나 쉬벌 ㅠㅠ
@@ -86,71 +101,74 @@
 													url : IndexURI,
 													method : "GET",
 							success : function(data){ //인덱스 로드
-								var IndexNumber = Number(data);	
+								var IndexNumber = Number(data); 
 								//alert(IndexNumber+"개의 글이 있습니다. 불러오는 중입니다.");
 								for(var z = IndexNumber; z > 0; z--){
-									var loadUrl = baseURI+"memo/wrapper/memo"+(z-1)+"/content.json";				
+									var loadUrl = baseURI+"memo/wrapper/memo"+(z-1)+"/content.json";                
 									$.ajax({
 										url : loadUrl,
 										method : "GET",
 										success : function(data){
-										//	alert(memoIndicator+":"+IndexNumber);
+										//  alert(memoIndicator+":"+IndexNumber);
 										//메모내용 로드 함수 호출된 순서에 상관없이
 										//불러오는 대로 함수를 실행하는 구나(지멋대로란 뜻)
 										if(memoIndicator < IndexNumber){ 
 											if(data != null){
-
 										var findingWords = 0; //찾고있는 단어의 개수
 												//alert(searchHashes.length);
-													var splitedArray = data.split(' ');
-													var t = 0 ;
-													for(var word in splitedArray){
+												var splitedArray = data.split(' ');
+												var t = 0 ;
+												for(var word in splitedArray){
 													if(data.indexOf(searchHashes[t]) >= 0 ){
 														findingWords++;
 														//alert(data+"의 데이터에서 맞춤 : "+word);
 														t++;
 													}
-													}
-													
+												}
+
 												
 												if(findingWords >= searchHashes.length){ //////////////// 찾는 단어가 몇개든 정확한지 
-												flushHTML();
-												var div = document.createElement("div");
-												div.setAttribute("class", "paperNo"+memoIndicator);			
+													flushHTML();
+													var div = document.createElement("div");
+													div.setAttribute("class", "paperNo"+memoIndicator);         
 											//alert(memoIndicator+1+"번째 데이터 : "+data);
 											var splitedArray = data.split(' ');
 											var linkedContent = '';
 											for(var word in splitedArray){
-												word = splitedArray[word];												
+												word = splitedArray[word];                                              
 												if(word.indexOf('#') >= 0){
 													/*word = '<font Class='+'"pIndicator'+memoIndicator+'" style="color:blue;" onclick="searchByClick('+memoIndicator+');">'+word+'</font>';
-*/
+													*/
 								if(word.indexOf('</p') > 0) {//존재하면
 									word = word.substring(0, word.indexOf('</p>'));
-									}
-							word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');">'+word+'</font>';
+								}
+								word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');">'+word+'</font>';
 													//alert(word);
 													//alert("해쉬태그 찾음:"+word);
-												}												
+												}                                               
 												linkedContent += word+' ';
 											}
 											data = linkedContent;
-											/* hashTag function */	
+											/* hashTag function */  
 
-											document.getElementsByClassName("paperContainer")[0].appendChild(div);						
+											document.getElementsByClassName("paperContainer")[0].appendChild(div);                      
 											$('.paperNo'+memoIndicator).append(data);
 											/////
 											//hashTagShow(memoIndicator);
 											memoIndicator++;
 										}
-										}
 									}
 								}
+							}
 									});//Jquery 종료
 									}//반복문 종료
 								}
 							});
 												//JQuery - 종료!***********************
+											} else{
+												showError();
+												return ;
+
 											}
 										}
 									}
@@ -184,14 +202,14 @@
 					<div class="loadIndicator">
 					</div>
 					<div class="paperContainer">
-					</div>	
+					</div>  
 					<script>
 						var IndexURI = "https://myweb-554e3.firebaseio.com/memo/index.json";
 						var memoURI = "https://myweb-554e3.firebaseio.com/memo.json";
 						var baseURI = "https://myweb-554e3.firebaseio.com/";
 						function delAllMemo(){
 							var param = {
-								index : 1
+								index : 0
 							};
 							$.ajax({
 								url : memoURI,
@@ -225,8 +243,36 @@
 						}
 					//반복문이 0에서 IndexNumber까지 돌아가는 속도보다 콜백함수를 호출하는 시간이 더 뒤에 있어서
 					//memoIndicator라는 변수를 만들고 이 변수에 맞춰서 로드함
+					function log(str){
+						console.log(str);
+					}
+					function showMemo(){
+						var temp = 0 ; 
+						var isUndefined = 0;
+						//log("Length of the memo Ary : \n"+memoAry.length);
+						for(var i = 0 ; i < memoAry.length; i++){
+						//	log("the loof syntax : "+i);
+							isUndefined += memoAry[i]?1:0;
+						}
+						var memoAryLength = Number(memoAry.length)-1;
+						//log("트루이면 성공! : " + memoAryLength+":"+isUndefined);
+						//if(isUndefined == memoAry.length)
+						//log("총 undefined : " +isUndefined);
+						if(isUndefined != memoAryLength){
 
-					(function() {							
+							return ; 
+						}
+						flushHTML();
+						for(var z = memoAry.length-1 ; z >0; z--){
+							//log(z);
+							var div = document.createElement("div");											
+							div.setAttribute("class", "paperNo"+z);
+							document.getElementsByClassName("paperContainer")[0].appendChild(div);				
+							$('.paperNo'+z).append(memoAry[z]);
+							}
+					}
+
+					(function() {                           
 						
 
 						$.ajax(
@@ -234,10 +280,12 @@
 							url : IndexURI,
 							method : "GET",
 							success : function(data){ //인덱스 로드
-								var IndexNumber = Number(data);	
+
+								var IndexNumber = Number(data); 
+								memoAryFlush(IndexNumber);
 								//alert(IndexNumber+"개의 글이 있습니다. 불러오는 중입니다.");
 								for(var z = IndexNumber; z > 0; z--){
-									var loadUrl = baseURI+"memo/wrapper/memo"+(z-1)+"/content.json";				
+									var loadUrl = baseURI+"memo/wrapper/memo"+(z-1)+"/content.json";                
 									$.ajax({
 										url : loadUrl,
 										method : "GET",
@@ -245,10 +293,8 @@
 										//메모내용 로드 함수 호출된 순서에 상관없이
 										//불러오는 대로 함수를 실행하는 구나(지멋대로란 뜻)
 										if(memoIndicator < IndexNumber){
-											if(data != null){		
-											flushHTML();									
-												var div = document.createElement("div");
-												div.setAttribute("class", "paperNo"+memoIndicator);			
+											if(data != null){       
+												flushHTML();    
 											//alert(memoIndicator+1+"번째 데이터 : "+data);
 											var splitedArray = data.split(' ');
 											var linkedContent = '';
@@ -256,25 +302,30 @@
 												word = splitedArray[word];
 
 												
-													if(word.indexOf('#') >= 0){
+												if(word.indexOf('#') >= 0){
 													/*word = '<font Class='+'"pIndicator'+memoIndicator+'" style="color:blue;" onclick="searchByClick('+memoIndicator+');">'+word+'</font>';
-*/
+													*/
 								if(word.indexOf('</p') > 0) {//존재하면
 									word = word.substring(0, word.indexOf('</p>'));
-									}
-							word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');">'+word+'</font>';
+								}
+								word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');">'+word+'</font>';
 													//alert(word);
 													//alert("해쉬태그 찾음:"+word);
-												}	
+												}   
 												linkedContent += word+' ';
 											}
-											data = linkedContent;
+											data = linkedContent; //가공한 데이터르 다시 data에 넣음
 											/* hashTag function */	
-											document.getElementsByClassName("paperContainer")[0].appendChild(div);
-
 											
-											$('.paperNo'+memoIndicator).append(data);
-											/////
+
+											var whereIsNumber1 = data.indexOf("<br>")+4;
+											var whereIsNumber2 = data.indexOf("번 째 기록");	
+											var memoNumber = data.substring(whereIsNumber1, whereIsNumber2);
+											memoAry[memoNumber] = data;
+											//log("the Number of the memo : "+memoNumber+"/"+memoAry[memoNumber]);
+											//log(memoAry);
+											//alert(memoNumber+"번 재글:"+memoAry[memoNumber]);
+											showMemo();
 											//hashTagShow(memoIndicator);
 											memoIndicator++;
 										}
