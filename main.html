@@ -2,21 +2,19 @@
 	<HEAD><TITLE>Wi-Note</TITLE> 
 		<meta charset="utf-8">
 		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
-<!-- 부가적인 테마 -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+		<!-- 부가적인 테마 -->
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
 
-<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+		<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 		<link rel="stylesheet" href="main.css">
 	</HEAD> 
 
 	<body onload="showloading();">
 		<div id="container" style="width:100%; height:500px;">
 			<div class="headLine">
-
-
 				<div class="profileDiv">
 
 					<h5 class="profile">정위대님</h5>
@@ -29,11 +27,14 @@
 
 					<input class="searchInput" onkeyup="searchKey(0);" type="text" name="hint" placeholder="당신의 생각을 검색하세요">
 					<script>
-					var memoAry = [];
-					function memoAryFlush(numb){
-						memoAry = [];
-						memoAry.length = numb;
-					}
+						var IndexURI = "https://myweb-554e3.firebaseio.com/memo/index.json";
+						var memoURI = "https://myweb-554e3.firebaseio.com/memo.json";
+						var baseURI = "https://myweb-554e3.firebaseio.com/";
+						var memoAry = [];
+						function memoAryFlush(numb){
+							memoAry = [];
+							memoAry.length = numb;
+						}
 						function showDialog(dialog){
 							document.getElementsByClassName('loadIndicator')[0].innerHTML = dialog;
 						}
@@ -60,223 +61,14 @@
 									someThinginContent = contentHTML == "<br><br><CENTER>해쉬태그로 검색해주세요!</center>";
 								if(someThinginContent == true)
 									baseFlush(); //비워버림
-						}
-
-						function searchByClick(id){
-							document.getElementsByClassName('searchInput')[0].value = id;
-							searchKey(id);  
-						}
-							function searchKey(id){
-								var clickOrEnter = 0;
-								if(id != 0 ||window.event.keyCode == 13){
-									
-									var searchText = "";
-									if(id != 0 ){
-										searchText = id;
-									} else{
-										searchText = 
-										document.getElementsByClassName('searchInput')[0].value;
-									}
-									showloading();
-										//alert(searchText);
-										var searchHashes = [];
-										var searchWord = "";
-										var content = searchText;
-										var splitedArray = content.split(' ');
-										var linkedContent = '';
-										for(var word in splitedArray){
-											word = splitedArray[word];
-											//if(true){                                     
-												if(word.indexOf('#') >= 0){
-												//alert("용량 : "+searchHashes);
-												searchHashes.length++;
-												searchHashes[searchHashes.length-1] = word; //배열의 크기를 조정해야 되는구나 쉬벌 ㅠㅠ
-												//alert("찾을 단어 : "+ word);
-												//alert("찾을 단어 : " + searchHashes[searchHashes.length-1]+"\n용량 : "+searchHashes.length);
-												//alert(word);
-												//document.getElementsByClassName('papers')[0].innerHTML = "";
-												memoIndicator = 0;
-												$.ajax( //JQEURY 시작 *****************************
-												{
-													url : IndexURI,
-													method : "GET",
-							success : function(data){ //인덱스 로드
-								var IndexNumber = Number(data); 
-								//alert(IndexNumber+"개의 글이 있습니다. 불러오는 중입니다.");
-								for(var z = IndexNumber; z > 0; z--){
-									var loadUrl = baseURI+"memo/wrapper/memo"+(z-1)+"/content.json";                
-									$.ajax({
-										url : loadUrl,
-										method : "GET",
-										success : function(data){
-										//  alert(memoIndicator+":"+IndexNumber);
-										//메모내용 로드 함수 호출된 순서에 상관없이
-										//불러오는 대로 함수를 실행하는 구나(지멋대로란 뜻)
-										if(memoIndicator < IndexNumber){ 
-											if(data != null){
-										var findingWords = 0; //찾고있는 단어의 개수
-												//alert(searchHashes.length);
-												var splitedArray = data.split(' ');
-												var t = 0 ;
-												for(var word in splitedArray){
-													if(data.indexOf(searchHashes[t]) >= 0 ){
-														findingWords++;
-														//alert(data+"의 데이터에서 맞춤 : "+word);
-														t++;
-													}
-												}
-
-												
-												if(findingWords >= searchHashes.length){ //////////////// 찾는 단어가 몇개든 정확한지 
-													flushHTML();
-													var div = document.createElement("div");
-													div.setAttribute("class", "paperNo"+memoIndicator);         
-											//alert(memoIndicator+1+"번째 데이터 : "+data);
-											var splitedArray = data.split(' ');
-											var linkedContent = '';
-											for(var word in splitedArray){
-												word = splitedArray[word];                                              
-												if(word.indexOf('#') >= 0){
-													/*word = '<font Class='+'"pIndicator'+memoIndicator+'" style="color:blue;" onclick="searchByClick('+memoIndicator+');">'+word+'</font>';
-													*/
-								if(word.indexOf('</p') > 0) {//존재하면
-									word = word.substring(0, word.indexOf('</p>'));
-								}
-								word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');">'+word+'</font>';
-													//alert(word);
-													//alert("해쉬태그 찾음:"+word);
-												}                                               
-												linkedContent += word+' ';
-											}
-											data = linkedContent;
-											/* hashTag function */  
-
-											document.getElementsByClassName("paperContainer")[0].appendChild(div);                      
-											$('.paperNo'+memoIndicator).append(data);
-											/////
-											//hashTagShow(memoIndicator);
-											memoIndicator++;
-										}
-									}
-								}
 							}
-									});//Jquery 종료
-									}//반복문 종료
-								}
-							});
-												//JQuery - 종료!***********************
-											} else{
-												showError();
-												return ;
 
-											}
-										}
-									}
-								}
-							</script>
-
-						</div>
-
-
-					</div>
-
-
-
-					<div id="menu" style="background-color:#FFFFFF;height:1000px;width:20%;float:left; padding-top: 30px;
-					border:1px solid #949494;
-					">
-					<p class="newMemo"><a href="write2.html"> 새 메모 쓰기</a></p>
-					<ul class="menu_folder">
-						<li><a href="main.html">전체 메모</a></li>
-						<li>중요 메모(미구현)</li>
-						<li>공유 메모(미구현)</li>
-					</ul>
-					<p class="deleteAllMemoBtn" onclick="delAllMemo();">메모 비우기</p>
-					<p class="folderAddBtn">폴더 추가(미구현)</p>
-				</div>
-				<div id="content" style="background-color:#FFFFFF;height:1000px;width:80%;float:left; border:1px solid #949494;
-				border-left: 0px;
-				">
-
-				<div class="papers">
-					<div class="loadIndicator">
-					</div>
-					<div class="paperContainer">
-					</div>  
-					<script>
-						var IndexURI = "https://myweb-554e3.firebaseio.com/memo/index.json";
-						var memoURI = "https://myweb-554e3.firebaseio.com/memo.json";
-						var baseURI = "https://myweb-554e3.firebaseio.com/";
-						function delAllMemo(){
-							var param = {
-								index : 0
-							};
-							$.ajax({
-								url : memoURI,
-								method : "PUT",
-								data : JSON.stringify(param),
-							success : function(data){ //인덱스 로드
-								//alert("success");
-								window.location.reload();
+							function searchByClick(id){
+								document.getElementsByClassName('searchInput')[0].value = id;
+								searchKey(id);  
 							}
-						});
-
-						}
-						var memoIndicator = 0 ;
-
-						function hashTagShow(tempIndicator){
-							//alert('paperNo'+tempIndicator);
-							var content = document.getElementsByClassName('paperNo'+tempIndicator).innerHTML;
-
-							var splitedArray = content.split(' ');
-							var linkedContent = '';
-							for(var word in splitedArray){
-								word = splitedArray[word];
-								if(word.indexOf('#') == 0){
-									word = '<a>'+word+'</a>';
-
-								}
-								linkedContent += word+' ';
-							}
-							//document.getElementsByClassName('papers')[0].innerHTML = "";
-
-						}
-					//반복문이 0에서 IndexNumber까지 돌아가는 속도보다 콜백함수를 호출하는 시간이 더 뒤에 있어서
-					//memoIndicator라는 변수를 만들고 이 변수에 맞춰서 로드함
-					function log(str){
-						console.log(str);
-					}
-					function showMemo(){
-						var temp = 0 ; 
-						var isUndefined = 0;
-						//log("Length of the memo Ary : \n"+memoAry.length);
-						for(var i = 0 ; i < memoAry.length; i++){
-						//	log("the loof syntax : "+i);
-							isUndefined += memoAry[i]?1:0;
-						}
-						var memoAryLength = Number(memoAry.length)-1;
-						//log("트루이면 성공! : " + memoAryLength+":"+isUndefined);
-						//if(isUndefined == memoAry.length)
-						//log("총 undefined : " +isUndefined);
-						if(isUndefined != memoAryLength){
-
-							return ; 
-						}
-						flushHTML();
-						for(var z = memoAry.length-1 ; z >0; z--){
-							//log(z);
-							var div = document.createElement("div");											
-							div.setAttribute("class", "paperNo"+z);
-							document.getElementsByClassName("paperContainer")[0].appendChild(div);				
-							$('.paperNo'+z).append(memoAry[z]);
-							}
-					}
-
-					(function() {                           
-						
-
-						$.ajax(
-						{
+							function getMemoFromDBJquery(){
+								$.ajax({
 							url : IndexURI,
 							method : "GET",
 							success : function(data){ //인덱스 로드
@@ -303,30 +95,23 @@
 
 												
 												if(word.indexOf('#') >= 0){
-													/*word = '<font Class='+'"pIndicator'+memoIndicator+'" style="color:blue;" onclick="searchByClick('+memoIndicator+');">'+word+'</font>';
-													*/
-								if(word.indexOf('</p') > 0) {//존재하면
-									word = word.substring(0, word.indexOf('</p>'));
-								}
-								word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');">'+word+'</font>';
-													//alert(word);
-													//alert("해쉬태그 찾음:"+word);
+													
+													if(word.indexOf('<font') > 0) {//존재하면, 즉 끝에 있으면
+														//log("있음!");
+														word = word.substring(0, word.indexOf('<font'));
+													}
+													word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');"> '+word+'</font><font ';
 												}   
 												linkedContent += word+' ';
 											}
+											//alert(data);
 											data = linkedContent; //가공한 데이터르 다시 data에 넣음
-											/* hashTag function */	
-											
-
-											var whereIsNumber1 = data.indexOf("<br>")+4;
+											//log(data);
+											var whereIsNumber1 = data.indexOf("font-size:12px;'><br>")+21;
 											var whereIsNumber2 = data.indexOf("번 째 기록");	
 											var memoNumber = data.substring(whereIsNumber1, whereIsNumber2);
 											memoAry[memoNumber] = data;
-											//log("the Number of the memo : "+memoNumber+"/"+memoAry[memoNumber]);
-											//log(memoAry);
-											//alert(memoNumber+"번 재글:"+memoAry[memoNumber]);
 											showMemo();
-											//hashTagShow(memoIndicator);
 											memoIndicator++;
 										}
 									}
@@ -336,27 +121,162 @@
 								}
 							});
 
-					}());
-				</script>
+							}		//getMemoFromDBJquery end				
+							function searchKey(id){
+								var clickOrEnter = 0;
+								if(id != 0 ||window.event.keyCode == 13){									
+									var searchText = "";
+									if(id != 0 ){
+										searchText = id;
+									} else{
+										searchText = 
+										document.getElementsByClassName('searchInput')[0].value;
+									}
+									showloading();
+									var searchHashes = [];
+									var searchWord = "";
+									var content = searchText;
+									var splitedArray = content.split(' ');
+									var linkedContent = '';
+									for(var word in splitedArray){
+										word = splitedArray[word];
+												if(word.indexOf('#') >= 0){ //해쉬태그만 검색함
+													searchHashes.length++;
+												searchHashes[searchHashes.length-1] = word; //배열의 크기를 조정해야 되는구나 쉬벌 ㅠㅠ
+												memoIndicator = 0;
+												$.ajax( //JQEURY 시작 *****************************
+												{
+													url : IndexURI,
+													method : "GET",
+							success : function(data){ //인덱스 로드
+								var IndexNumber = Number(data); 
+								for(var z = IndexNumber; z > 0; z--){
+									var loadUrl = baseURI+"memo/wrapper/memo"+(z-1)+"/content.json";                
+									$.ajax({
+										url : loadUrl,
+										method : "GET",
+										success : function(data){
+											if(memoIndicator < IndexNumber){ 
+												if(data != null){
+										var findingWords = 0; //찾고있는 단어의 개수
+										var splitedArray = data.split(' ');
+										var t = 0 ;
+										for(var word in splitedArray){
+											if(data.indexOf(searchHashes[t]) >= 0 ){
+												findingWords++;
+												t++;
+											}
+										}												
+												if(findingWords >= searchHashes.length){ //////////////// 찾는 단어가 몇개든 정확한지 
+													flushHTML();
+													var div = document.createElement("div");
+													div.setAttribute("class", "paperNo"+memoIndicator);         
+											//alert(memoIndicator+1+"번째 데이터 : "+data);
+											var splitedArray = data.split(' ');
+											var linkedContent = '';
+											for(var word in splitedArray){
+												word = splitedArray[word];                                              
+													if(word.indexOf('#') >= 0){
+													
+													if(word.indexOf('<font') > 0) {//존재하면, 즉 끝에 있으면
+														//log("있음!");
+														word = word.substring(0, word.indexOf('<font'));
+													}
+													word = '<font style="color:blue;" onclick="searchByClick(\''+word+'\');"> '+word+'</font><font ';
+												}                                            
+							linkedContent += word+' ';
+						}
+						data = linkedContent;
+						/* hashTag function */
+						document.getElementsByClassName("paperContainer")[0].appendChild(div);               
+						$('.paperNo'+memoIndicator).append(data);
+						memoIndicator++;
+					}
+				}
+			}
+		}
+	});
+								}
+							}
+						});
+											} else{
+												showError();
+												return ;
+
+											}
+										}
+									}
+								}
+								function delAllMemo(){
+									var param = {
+										index : 0
+									};
+									$.ajax({
+										url : memoURI,
+										method : "PUT",
+										data : JSON.stringify(param),
+									success : function(data){ //인덱스 로드
+										//alert("success");
+										window.location.reload();
+									}
+									});
+								}
+							var memoIndicator = 0 ;
+							//반복문이 0에서 IndexNumber까지 돌아가는 속도보다 콜백함수를 호출하는 시간이 더 뒤에 있어서
+							//memoIndicator라는 변수를 만들고 이 변수에 맞춰서 로드함
+							function log(str){
+								console.log(str);
+							}
+							function showMemo(){
+								flushHTML();
+								var temp = 0 ; 
+								var isUndefined = 0;
+								//log("Length of the memo Ary : \n"+memoAry.length);
+								for(var i = 0 ; i < memoAry.length; i++){
+								//	log("the loof syntax : "+i);
+								isUndefined += memoAry[i]?1:0;
+								}
+								var memoAryLength = Number(memoAry.length)-1;
+								if(isUndefined != memoAryLength)
+									return ; 						
+								for(var z = memoAry.length-1 ; z >0; z--){
+									//log(z+"번째 메모");
+									//log(z);
+									var div = document.createElement("div");											
+									div.setAttribute("class", "paperNo"+z);
+									document.getElementsByClassName("paperContainer")[0].appendChild(div);				
+									$('.paperNo'+z).append(memoAry[z]);
+								}
+							}
+							getMemoFromDBJquery();
+							</script>
+						</div>
+					</div>
+					<div id="menu" style="background-color:#FFFFFF;height:1000px;width:20%;float:left; padding-top: 30px;
+					border:1px solid #949494;
+					">
+					<p class="newMemo"><a href="write2.html"> 새 메모 쓰기</a></p>
+					<ul class="menu_folder">
+						<li><a href="main.html">전체 메모</a></li>
+						<li>중요 메모(미구현)</li>
+						<li>공유 메모(미구현)</li>
+					</ul>
+					<p class="deleteAllMemoBtn" onclick="delAllMemo();">메모 비우기</p>
+					<p class="folderAddBtn">폴더 추가(미구현)</p>
+				</div>
+				<div id="content" style="background-color:#FFFFFF;height:1000px;width:80%;float:left; border:1px solid #949494;
+				border-left: 0px;
+				">
+
+				<div class="papers">
+					<div class="loadIndicator">
+					</div>
+					<div class="paperContainer">
+					</div>  
 			</div>
-
-
-
 		</div>
-
-
 	</div>
-
-
-
 </div>
-
-
-<!--
-
-<div id="footer" style="background-color:#FFFEF1;clear:both; height: 500px;">
-</div>
--->
 </div>
 </body>
 </html> 

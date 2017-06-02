@@ -64,7 +64,7 @@
 
 				<form >
 					<TEXTAREA placeholder="제목을 입력하세요"
-					id="titledata"  name="titlebar" style="width: 100%; height: 40px;
+					id="titledata"  name="titledata" style="width: 100%; height: 40px;
 					font-size:20px; text-align: center; "></TEXTAREA>
 				</form>
 				<form style="height: 400px;">
@@ -105,7 +105,7 @@
 <script>
 	function btn_click(){
 		var memoContents = CKEDITOR.instances.editor1.getData();
-
+		var memoTitle = document.getElementById("titledata").value;
 		var IndexURI = "https://myweb-554e3.firebaseio.com/memo/index.json";
 		var memoURI = "https://myweb-554e3.firebaseio.com/memo.json";
 		var baseURI = "https://myweb-554e3.firebaseio.com/memo/wrapper/";
@@ -131,14 +131,15 @@
 				////이까지 읽어들이기
 				var titleURI = baseURI+"memo"+indexNumber+".json";
 				var d = new Date();
-				var nowTime = " <font style='color:grey; font-size:12px;'><br>"+(indexNumber+1)+"번 째 기록 : "+(d.getMonth() + 1)+"월 "+d.getDate()+"일 "+d.getHours()+"시 "+d.getMinutes()+"분";
+				var nowTime = "<font style='color:grey; font-size:12px;'><br>"+(indexNumber+1)+"번 째 기록 : "+(d.getMonth() + 1)+"월 "+d.getDate()+"일 "+d.getHours()+"시 "+d.getMinutes()+"분";
 				+"</font>";
-				//
+				memoContents = "<p><font style='font-size:20px;'>" + memoTitle +"</font><br>"+ memoContents.substring(3,memoContents.length);
+				//alert("가공전 : "+memoContents);
 				memoContents = memoContents.substring(0,memoContents.length-4)+nowTime+"</p>";
-				//
+				//alert("가공후 : "+memoContents);
 				var param = {
 					content : memoContents,
-					index : indexNumber,
+					index : indexNumber
 
 				};
 
