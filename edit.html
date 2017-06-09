@@ -1,0 +1,198 @@
+<HTML> 
+	<HEAD><TITLE>Wi-Note:글쓰기</TITLE> 
+<meta charset="utf-8">
+		<!-- 좆같은 ckeditor -->
+
+		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+		<script src="ckeditor/ckeditor.js"></script>
+		<script src="ckeditor/adapters/jquery.js"></script>
+
+		<!-- 좆같은 ckeditor -->
+
+
+
+		<!-- 합쳐지고 최소화된 최신 CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+<!-- 부가적인 테마 -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript">  
+			var Request = function() {  
+				this.getParameter = function(name) {  
+					var rtnval = '';  
+					var nowAddress = unescape(location.href);  
+					var parameters = (nowAddress.slice(nowAddress.indexOf('?') + 1,  
+						nowAddress.length)).split('&');  
+					for (var i = 0; i < parameters.length; i++) {  
+						var varName = parameters[i].split('=')[0];  
+						if (varName.toUpperCase() == name.toUpperCase()) {  
+							rtnval = parameters[i].split('=')[1];  
+							break;  
+						}  
+					} 
+		   // alert(decodeURIComponent(rtnval,"UTF-8"));
+			return decodeURIComponent(rtnval,"UTF-8");  //디코드했는데도 왜 이렇게 뜰까 ?
+		}  
+	}  
+	var request = new Request();  
+</script>
+
+<link rel="stylesheet" href="css/write.css">
+			</HEAD> 
+			<body>
+				<div id="container" style="width:100%; height:500px;">
+					<div class="headLine">
+
+
+						<div class="profileDiv">
+
+							<h5 class="profile">정위대님</h5>
+
+						</div>
+
+						<div class="topbar">
+					<img class="icon" >
+					<h1 class="titlename"
+					style="margin-left: 0px;">Don't forget your wiseness</h1>
+					
+					<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+						</div>
+
+
+					</div>
+
+
+
+						<div class="menu">
+					<p class="newMemo"><a href="write.html"> 새 메모 쓰기</a></p>
+					<ul class="menu_folder">
+						<li><a class="totalMemo" href="main.html">전체 메모</a></li>
+						<li>중요 메모(미구현)</li>
+						<li>공유 메모(미구현)</li>
+					</ul>
+					<p class="deleteAllMemoBtn" onclick="delAllMemo();">메모 비우기</p>
+					<p class="folderAddBtn">폴더 추가(미구현)</p>
+				</div>
+				<div class="content">
+
+				<form class="titleBarForm" >
+					<TEXTAREA placeholder="제목을 입력하세요"
+					id="titledata" name="titledata" style="width: 100%; height: 30px; text-align: center; "></TEXTAREA>
+				</form>
+				<form style="height: 400px;">
+
+					<textarea name="editor1" id="editor1" rows="15" cols="80" style="height:100%;">
+					</textarea>
+					<script>
+			// Replace the <textarea id="editor1"> with a CKEditor
+			// instance, using default configuration.
+			CKEDITOR.config.width = "99.9%"; // ³ÐÀÌ 
+			CKEDITOR.config.height = 400; // ³ôÀÌ // ÆÛ¼¾Æ®·Î °¡´ÉÇÕ´Ï´Ù.
+			CKEDITOR.config.fontSize_defaultLabel = "20px"; // ³ôÀÌ // ÆÛ¼¾Æ®·Î °¡´ÉÇÕ´Ï´Ù.
+
+			//CKEDITOR.config.language = 'ja';
+			CKEDITOR.replace( 'editor1',{
+				filebrowserImageUploadUrl: "ckeditor/plugins/imgupload.php"
+			});
+			
+			CKEDITOR.on('dialogDefinition', function( ev ){
+				var dialogName = ev.data.name;
+				var dialogDefinition = ev.data.definition;
+
+				switch (dialogName) {
+					case 'image':
+                    dialogDefinition.removeContents('Link'); // Link ÅÇ Á¦°Å
+                    break;
+                }
+                var uploadTab = dialogDefinition.getContents( 'Upload' );
+                var uploadButton = uploadTab.get('uploadButton');
+                uploadButton['filebrowser']['onSelect'] = function( fileUrl, errorMessage ) {
+				console.log(fileUrl); // ¾÷·ÎµåµÈ ÆÄÀÏ url ÀÔ´Ï´Ù. 
+			}
+		});
+			
+	</script>
+</form>
+<script>
+	var title = request.getParameter('title');
+	var content = request.getParameter('content');
+	var index = Number(request.getParameter('index'))-1;
+	document.getElementById('titledata').value = title;
+	document.getElementById('editor1').value = content;
+</script>
+
+
+<button id="memoSave" onclick="btn_click();" style="width: 100%; height: 85px; border:none;"> 수정 </button>
+<button id="memoDelete" onclick="del_btn_click();" style="width: 100%; color: red; height: 85px; border:none;"> 삭제 </button>
+<script>
+	var IndexURI = "https://myweb-554e3.firebaseio.com/memo/index.json";
+	var memoURI = "https://myweb-554e3.firebaseio.com/memo.json";
+	var baseURI = "https://myweb-554e3.firebaseio.com/memo/wrapper/";
+
+function del_btn_click(){
+	var titleURI = baseURI+"memo"+index+".json";
+	var paramContent = "none";
+		var param = {
+					content : paramContent,
+					index : index
+				};
+$.ajax({
+	url : titleURI,
+	method : "PATCH",
+	data : JSON.stringify(param),
+	success : function(data){
+		$(location).attr('href',"main.html");
+
+	}
+});
+} 
+	function btn_click(){
+		var memoContents = CKEDITOR.instances.editor1.getData();
+		var memoTitle = document.getElementById("titledata").value;
+		var titleURI = baseURI+"memo"+index+".json";
+		var d = new Date();
+		var nowTime = "<font style='color:grey; font-size:12px;'><br>"+ Number(index+1) +"번 째 기록 : "+(d.getMonth() + 1)+"월 "+d.getDate()+"일 "+d.getHours()+"시 "+d.getMinutes()+"분";
+		+"</font>";
+		memoContents = "<p><font style='font-size:20px;'>" + memoTitle +"</font><br>"+ memoContents.substring(3,memoContents.length);
+				//alert("가공전 : "+memoContents);
+				memoContents = memoContents.substring(0,memoContents.length-4)+nowTime+"</p>";
+				//alert("가공후 : "+memoContents);
+				var param = {
+					content : memoContents,
+					index : index
+
+				};
+
+				$.ajax ( { //메모 데이터 전송
+					url : titleURI,
+					method : "PATCH",
+					data : JSON.stringify(param),
+					success : function(data){
+						$(location).attr('href',"main.html");
+					}
+				});
+			}
+
+		
+</script>
+
+</div>
+
+
+</div>
+
+
+
+</div>
+
+
+
+
+
+</div>
+</body>
+</html> 
